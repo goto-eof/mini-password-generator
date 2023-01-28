@@ -22,6 +22,7 @@ fn build_ui(application: &gtk4::Application) {
     window.set_default_size(340, 120);
     let display = gdk4::Display::default().unwrap();
     let clipboard = display.clipboard();
+
     let grid = gtk4::Grid::builder()
         .margin_start(6)
         .margin_end(6)
@@ -35,86 +36,70 @@ fn build_ui(application: &gtk4::Application) {
 
     window.set_child(Some(&grid));
 
+    // buttons
     let password_field = gtk4::Entry::builder().placeholder_text("").build();
-    let generated_password = generate_password(20, true, true, true, true);
-    password_field.set_text(generated_password.0.as_str());
-
-    grid.attach(&password_field, 0, 0, 1, 1);
-
     let upper_case = gtk4::CheckButton::with_label("Upper case letters");
-    upper_case.activate();
     let lower_case = gtk4::CheckButton::with_label("Lower case letters");
-    lower_case.activate();
     let numbers = gtk4::CheckButton::with_label("Numbers");
-    numbers.activate();
     let symbols = gtk4::CheckButton::with_label("Symbols");
-    symbols.activate();
+    let length_box = gtk4::Entry::builder().placeholder_text("").build();
+    let generated_password = generate_password(20, true, true, true, true);
+    let range = gtk4::Scale::with_range(gtk4::Orientation::Horizontal, 1.0, 32.0, 1.0);
+    let generate_button = gtk4::Button::with_label("Generate");
+    let copy_button = gtk4::Button::with_label("Copy");
+    let quit_button = gtk4::Button::with_label("Exit");
+    let title = gtk4::Label::builder()
+        .label("Password entropy")
+        .halign(gtk4::Align::Start)
+        .build();
+    title.add_css_class("title-2");
+
+    // attaching to the grid
+    grid.attach(&password_field, 0, 0, 1, 1);
     grid.attach(&upper_case, 0, 2, 1, 1);
     grid.attach(&lower_case, 0, 3, 1, 1);
     grid.attach(&numbers, 0, 4, 1, 1);
     grid.attach(&symbols, 0, 5, 1, 1);
-
-    let length_box = gtk4::Entry::builder().placeholder_text("").build();
-    length_box.set_text("20");
     grid.attach(&length_box, 0, 1, 1, 1);
-
-    let range = gtk4::Scale::with_range(gtk4::Orientation::Horizontal, 1.0, 32.0, 1.0);
-    range.set_value(20.0);
+    grid.attach(&copy_button, 2, 0, 1, 1);
+    grid.attach(&quit_button, 0, 6, 3, 1);
+    grid.attach(&title, 1, 2, 1, 1);
+    grid.attach(&generate_button, 1, 0, 1, 1);
     grid.attach(&range, 1, 1, 2, 1);
+
+    // setting default values for checkboxes
+    upper_case.activate();
+    lower_case.activate();
+    numbers.activate();
+    symbols.activate();
+
+    length_box.set_text("20");
+    password_field.set_text(generated_password.0.as_str());
+    range.set_value(20.0);
+    update_entropy_label(&title, generated_password.1);
+
+    // actions
+    quit_button.connect_clicked(clone!(@weak window => move |_| window.destroy()));
+    generate_button.connect_clicked(
+        clone!(@weak title, @weak length_box, @weak clipboard, @weak upper_case,  @weak lower_case,  @weak numbers,  @weak  symbols, @weak password_field => move |_btn| {
+        let length_opt = length_box.text().parse::<i32>();
+        let mut length = 10;
+        if length_opt.is_ok(){
+            length = length_opt.unwrap();
+        }
+        let generated_password = generate_password(length, upper_case.is_active(), lower_case.is_active(), numbers.is_active(), symbols.is_active());
+            password_field.set_text(generated_password.0.as_str());
+            update_entropy_label(&title, generated_password.1);
+        }),
+    );
     range.connect_value_changed(clone!(@weak length_box=>move |range| {
         length_box.set_text( format!("{}",range.value().trunc()).as_str());
     }));
-
-    let generate_button = gtk4::Button::with_label("Generate");
-
-    grid.attach(&generate_button, 1, 0, 1, 1);
-
-    let copy_button = gtk4::Button::with_label("Copy");
     copy_button.connect_clicked(
         clone!(@weak clipboard, @weak password_field => move |_btn| {
             let text = password_field.text();
             clipboard.set_text(&text);
         }),
-    );
-    grid.attach(&copy_button, 2, 0, 1, 1);
-
-    let quit_button = gtk4::Button::with_label("Exit");
-    quit_button.connect_clicked(clone!(@weak window => move |_| window.destroy()));
-
-    grid.attach(&quit_button, 0, 6, 3, 1);
-
-    let password_length_opt = length_box.text().parse::<i32>();
-    let mut password_length = 20;
-    if password_length_opt.is_ok() {
-        password_length = password_length_opt.unwrap();
-    }
-    let title = gtk4::Label::builder()
-        .label(
-            format!(
-                "Password Entropy: {}",
-                calculate_entropy(password_length, 100).trunc()
-            )
-            .as_str(),
-        )
-        .halign(gtk4::Align::Start)
-        .build();
-    title.add_css_class("title-2");
-
-    grid.attach(&title, 1, 2, 1, 1);
-
-    update_entropy_label(&title, generated_password.1);
-
-    generate_button.connect_clicked(
-        clone!(@weak title, @weak length_box, @weak clipboard, @weak upper_case,  @weak lower_case,  @weak numbers,  @weak  symbols, @weak password_field => move |_btn| {
-       let length_opt = length_box.text().parse::<i32>();
-let mut length = 10;
-       if length_opt.is_ok(){
-    length = length_opt.unwrap();
-}
-       let generated_password = generate_password(length, upper_case.is_active(), lower_case.is_active(), numbers.is_active(), symbols.is_active());
-            password_field.set_text(generated_password.0.as_str());
-            update_entropy_label(&title, generated_password.1);
-               }),
     );
 
     window.show();
