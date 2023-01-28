@@ -36,26 +36,24 @@ fn build_ui(application: &gtk4::Application) {
     password_field.set_text(generate_password(10).as_str());
     grid.attach(&password_field, 0, 0, 1, 1);
 
-    // Create the second button and put it into the grid at (1, 0)
-    let button_2 = gtk4::Button::with_label("Generate");
-    button_2.connect_clicked(
+    let generate_button = gtk4::Button::with_label("Generate");
+    generate_button.connect_clicked(
         clone!(@weak clipboard, @weak password_field => move |_btn| {
         password_field.set_text(generate_password(10).as_str());
                }),
     );
 
-    grid.attach(&button_2, 1, 0, 1, 1);
-    let button_3 = gtk4::Button::with_label("Copy");
-    button_3.connect_clicked(
+    grid.attach(&generate_button, 1, 0, 1, 1);
+    let copy_button = gtk4::Button::with_label("Copy");
+    copy_button.connect_clicked(
         clone!(@weak clipboard, @weak password_field => move |_btn| {
             let text = password_field.text();
             clipboard.set_text(&text);
         }),
     );
-    grid.attach(&button_3, 2, 0, 1, 1);
+    grid.attach(&copy_button, 2, 0, 1, 1);
 
-    // Create the quit button and put it into the grid at (0, 1)
-    let quit_button = gtk4::Button::with_label("Quit");
+    let quit_button = gtk4::Button::with_label("Exit");
     quit_button.connect_clicked(clone!(@weak window => move |_| window.destroy()));
 
     grid.attach(&quit_button, 0, 1, 3, 1);
