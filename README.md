@@ -12,3 +12,8 @@ brew install gtk4
 ```
 cargo run
 ```
+
+### Build a production version
+```
+cargo build --release
+```
