@@ -1,7 +1,7 @@
 # Mini password generator
 Mini password generator is a little experiment with GTK4 and Rust.
 
-![alt screenshot](screenshot.png)
+![alt screenshot](screenshot1.png)
 
 ### Install GTK4 on Mac
 ```
