@@ -2,8 +2,9 @@ use gdk4::traits::DisplayExt;
 use gtk4::glib::clone;
 use gtk4::prelude::{ApplicationExt, ApplicationExtManual};
 use gtk4::traits::{ButtonExt, EditableExt, GridExt, GtkWindowExt, WidgetExt};
-use rand::distributions::Uniform;
-use rand::prelude::Distribution;
+use password_generator::core::generate_password;
+pub mod password_generator;
+
 fn main() {
     let application =
         gtk4::Application::new(Some("com.andrei.minipasswordgenerator"), Default::default());
@@ -58,22 +59,4 @@ fn build_ui(application: &gtk4::Application) {
     grid.attach(&quit_button, 0, 1, 3, 1);
 
     window.show();
-}
-
-fn generate_password(length: i32) -> String {
-    let low_case = "abcdefghijklmnopqrstuvxyz";
-    let up_case = "ABCDEFGHIJKLMNOPQRSTUVXYZ";
-    let numbers = "0123456789";
-    let chars = "\\!\"£$%&/()=?^*°:;.,";
-    let all = format!("{}{}{}{}", low_case, up_case, numbers, chars);
-    let mut rng = rand::thread_rng();
-    let die = Uniform::from(1..all.len() - 2);
-    let mut password = "".to_owned();
-    for _n in 1..length {
-        let throw = die.sample(&mut rng);
-        let mut char = all.chars();
-        let char = char.nth(throw).unwrap();
-        password = format!("{}{}", password, char);
-    }
-    return password;
 }
