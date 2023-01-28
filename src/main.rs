@@ -2,7 +2,6 @@ use gdk4::traits::DisplayExt;
 use gtk4::glib::clone;
 use gtk4::prelude::{ApplicationExt, ApplicationExtManual};
 use gtk4::traits::{ButtonExt, EditableExt, GridExt, GtkWindowExt, WidgetExt};
-use gtk4::Entry;
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 fn main() {
@@ -70,7 +69,7 @@ fn generate_password(length: i32) -> String {
     let mut rng = rand::thread_rng();
     let die = Uniform::from(1..all.len() - 2);
     let mut password = "".to_owned();
-    for n in 1..length {
+    for _n in 1..length {
         let throw = die.sample(&mut rng);
         let mut char = all.chars();
         let char = char.nth(throw).unwrap();
