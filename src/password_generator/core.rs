@@ -44,7 +44,6 @@ pub fn generate_password(length: i32, uc: bool, lc: bool, num: bool, sym: bool) 
 pub fn generate_mnemonic_password(length: i32) -> (String, f64) {
     let consonants_lc = "bcdfghjklmnpqrstuvxyz";
     let vowels_lc = "aeiou";
-    // let numbers = "0123456789";
 
     let mut password = "".to_owned();
 
