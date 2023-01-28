@@ -1,14 +1,38 @@
+use std::fmt::UpperExp;
+
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
-pub fn generate_password(length: i32) -> String {
+pub fn generate_password(length: i32, uc: bool, lc: bool, num: bool, sym: bool) -> String {
+    if !uc && !lc && !num && !sym {
+        return "".to_owned();
+    }
+
     let low_case = "abcdefghijklmnopqrstuvxyz";
     let up_case = "ABCDEFGHIJKLMNOPQRSTUVXYZ";
     let numbers = "0123456789";
-    let chars = "\\!\"£$%&/()=?^*°:;.,";
-    let all = format!("{}{}{}{}", low_case, up_case, numbers, chars);
+    let symbols = "!£$%&/()=?^*°:;.,";
+
+    let mut all = "".to_owned();
+
+    if uc {
+        all = format!("{}{}", all, up_case);
+    }
+
+    if lc {
+        all = format!("{}{}", all, low_case);
+    }
+
+    if num {
+        all = format!("{}{}", all, numbers);
+    }
+
+    if sym {
+        all = format!("{}{}", all, symbols);
+    }
+
     let mut rng = rand::thread_rng();
-    let die = Uniform::from(1..all.len() - 2);
+    let die = Uniform::from(0..all.len() - 2);
     let mut password = "".to_owned();
     for _n in 1..length {
         let throw = die.sample(&mut rng);
