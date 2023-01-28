@@ -93,9 +93,6 @@ fn build_ui(application: &gtk4::Application) {
             false =>  generate_password(length, upper_case.is_active(), lower_case.is_active(), numbers.is_active(), symbols.is_active()), 
             true => generate_mnemonic_password(length)
         };
-           
-        
-        
         password_field.set_text(generated_password.0.as_str());
             update_entropy_label(&title, generated_password.1);
         }),
