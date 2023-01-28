@@ -10,8 +10,7 @@ brew install gtk4
 
 ### Linux - Install libraries
 ```
-sudo apt-get install libglib2.0-dev
-sudo apt-get install libgtk-4-dev libpango1.0-dev
+sudo apt-get install libglib2.0-dev libgtk-4-dev libpango1.0-dev
 ```
 
 ### Run application
