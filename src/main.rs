@@ -108,7 +108,7 @@ fn build_ui(application: &gtk4::Application) {
     );
 
     mnemonic.connect_toggled(
-        clone!(@weak upper_case, @weak lower_case, @weak numbers, @weak symbols => move |mnemonic|{
+        clone!(@weak upper_case, @weak lower_case, @weak numbers, @weak symbols => move |_|{
                upper_case.set_active(false);
                lower_case.set_active(false);
                numbers.set_active(false);
