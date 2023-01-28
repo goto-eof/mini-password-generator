@@ -2,6 +2,7 @@
 name = "gtk-test"
 version = "0.1.0"
 edition = "2021"
+authors=["Andrei Dodu"]
 
 [dependencies]
 gtk4 = "0.5.5"

@@ -5,7 +5,7 @@ use gtk4::traits::{
     ButtonExt, CheckButtonExt, EditableExt, GridExt, GtkWindowExt, RangeExt, WidgetExt,
 };
 use gtk4::Label;
-use password_generator::core::{calculate_entropy, generate_password};
+use password_generator::core::generate_password;
 pub mod password_generator;
 
 fn main() {
