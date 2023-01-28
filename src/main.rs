@@ -119,19 +119,19 @@ fn build_ui(application: &gtk4::Application) {
         }),
     );
 
-    upper_case.connect_toggled(clone!(@weak mnemonic =>move |upper_case|{
+    upper_case.connect_toggled(clone!(@weak mnemonic =>move |_|{
     mnemonic.set_active(false);
     }));
 
-    lower_case.connect_toggled(clone!(@weak mnemonic =>move |lower_case|{
+    lower_case.connect_toggled(clone!(@weak mnemonic =>move |_|{
     mnemonic.set_active(false);
     }));
 
-    numbers.connect_toggled(clone!(@weak mnemonic =>move |numbers|{
+    numbers.connect_toggled(clone!(@weak mnemonic =>move |_|{
     mnemonic.set_active(false);
     }));
 
-    symbols.connect_toggled(clone!(@weak mnemonic =>move |symbols|{
+    symbols.connect_toggled(clone!(@weak mnemonic =>move |_|{
     mnemonic.set_active(false);
     }));
 
