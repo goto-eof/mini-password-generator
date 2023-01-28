@@ -32,13 +32,50 @@ pub fn generate_password(length: i32, uc: bool, lc: bool, num: bool, sym: bool) 
     let mut rng = rand::thread_rng();
     let die = Uniform::from(0..all.len() - 2);
     let mut password = "".to_owned();
-    for _n in 1..length {
+    for _n in 1..length + 1 {
         let throw = die.sample(&mut rng);
         let mut char = all.chars();
         let char = char.nth(throw).unwrap();
         password = format!("{}{}", password, char);
     }
     return (password, calculate_entropy(length, all.len().into()));
+}
+
+pub fn generate_mnemonic_password(length: i32) -> (String, f64) {
+    let consonants_lc = "bcdfghjklmnpqrstuvxyz";
+    let vowels_lc = "aeiou";
+    // let numbers = "0123456789";
+
+    let mut password = "".to_owned();
+
+    for i in 1..length + 1 {
+        if i % 2 == 0 {
+            let mut rng = rand::thread_rng();
+            let die = Uniform::from(0..vowels_lc.len() - 1);
+            let throw = die.sample(&mut rng);
+            let mut char = vowels_lc.chars();
+            let mut char = char.nth(throw).unwrap();
+            if throw % 2 == 1 {
+                char = char.to_ascii_uppercase();
+            }
+
+            password = format!("{}{}", password, char);
+        } else {
+            let mut rng = rand::thread_rng();
+            let die = Uniform::from(0..consonants_lc.len() - 1);
+            let throw = die.sample(&mut rng);
+            let mut char = consonants_lc.chars();
+            let mut char = char.nth(throw).unwrap();
+            if throw % 2 == 1 {
+                char = char.to_ascii_uppercase();
+            }
+            password = format!("{}{}", password, char);
+        }
+    }
+    return (
+        password,
+        calculate_entropy(length, consonants_lc.len() * 2 + vowels_lc.len() * 2),
+    );
 }
 
 pub fn calculate_entropy(password_length: i32, charset_length: usize) -> f64 {

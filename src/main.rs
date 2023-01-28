@@ -5,7 +5,7 @@ use gtk4::traits::{
     ButtonExt, CheckButtonExt, EditableExt, GridExt, GtkWindowExt, RangeExt, WidgetExt,
 };
 use gtk4::Label;
-use password_generator::core::generate_password;
+use password_generator::core::{generate_password, generate_mnemonic_password};
 pub mod password_generator;
 
 fn main() {
@@ -39,6 +39,7 @@ fn build_ui(application: &gtk4::Application) {
     // buttons
     let password_field = gtk4::Entry::builder().placeholder_text("").build();
     let upper_case = gtk4::CheckButton::with_label("Upper case letters");
+    let mnemonic = gtk4::CheckButton::with_label("Mnemonic");
     let lower_case = gtk4::CheckButton::with_label("Lower case letters");
     let numbers = gtk4::CheckButton::with_label("Numbers");
     let symbols = gtk4::CheckButton::with_label("Symbols");
@@ -56,13 +57,14 @@ fn build_ui(application: &gtk4::Application) {
 
     // attaching to the grid
     grid.attach(&password_field, 0, 0, 1, 1);
-    grid.attach(&upper_case, 0, 2, 1, 1);
-    grid.attach(&lower_case, 0, 3, 1, 1);
-    grid.attach(&numbers, 0, 4, 1, 1);
-    grid.attach(&symbols, 0, 5, 1, 1);
+    grid.attach(&mnemonic, 0, 2, 1, 1);
+    grid.attach(&upper_case, 0, 3, 1, 1);
+    grid.attach(&lower_case, 0, 4, 1, 1);
+    grid.attach(&numbers, 0, 5, 1, 1);
+    grid.attach(&symbols, 0, 6, 1, 1);
     grid.attach(&length_box, 0, 1, 1, 1);
     grid.attach(&copy_button, 2, 0, 1, 1);
-    grid.attach(&quit_button, 0, 6, 3, 1);
+    grid.attach(&quit_button, 0, 7, 3, 1);
     grid.attach(&title, 1, 2, 1, 1);
     grid.attach(&generate_button, 1, 0, 1, 1);
     grid.attach(&range, 1, 1, 2, 1);
@@ -81,14 +83,20 @@ fn build_ui(application: &gtk4::Application) {
     // actions
     quit_button.connect_clicked(clone!(@weak window => move |_| window.destroy()));
     generate_button.connect_clicked(
-        clone!(@weak title, @weak length_box, @weak clipboard, @weak upper_case,  @weak lower_case,  @weak numbers,  @weak  symbols, @weak password_field => move |_btn| {
+        clone!(@weak mnemonic, @weak title, @weak length_box, @weak clipboard, @weak upper_case,  @weak lower_case,  @weak numbers,  @weak  symbols, @weak password_field => move |_btn| {
         let length_opt = length_box.text().parse::<i32>();
         let mut length = 10;
         if length_opt.is_ok(){
             length = length_opt.unwrap();
         }
-        let generated_password = generate_password(length, upper_case.is_active(), lower_case.is_active(), numbers.is_active(), symbols.is_active());
-            password_field.set_text(generated_password.0.as_str());
+        let generated_password = match mnemonic.is_active() {
+            false =>  generate_password(length, upper_case.is_active(), lower_case.is_active(), numbers.is_active(), symbols.is_active()), 
+            true => generate_mnemonic_password(length)
+        };
+           
+        
+        
+        password_field.set_text(generated_password.0.as_str());
             update_entropy_label(&title, generated_password.1);
         }),
     );
@@ -101,6 +109,31 @@ fn build_ui(application: &gtk4::Application) {
             clipboard.set_text(&text);
         }),
     );
+
+    mnemonic.connect_toggled(
+        clone!(@weak upper_case, @weak lower_case, @weak numbers, @weak symbols => move |mnemonic|{
+               upper_case.set_active(false);
+               lower_case.set_active(false);
+               numbers.set_active(false);
+               symbols.set_active(false);
+        }),
+    );
+
+    upper_case.connect_toggled(clone!(@weak mnemonic =>move |upper_case|{
+    mnemonic.set_active(false);
+    }));
+
+    lower_case.connect_toggled(clone!(@weak mnemonic =>move |lower_case|{
+    mnemonic.set_active(false);
+    }));
+
+    numbers.connect_toggled(clone!(@weak mnemonic =>move |numbers|{
+    mnemonic.set_active(false);
+    }));
+
+    symbols.connect_toggled(clone!(@weak mnemonic =>move |symbols|{
+    mnemonic.set_active(false);
+    }));
 
     window.show();
 }
